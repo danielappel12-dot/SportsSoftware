@@ -1,6 +1,8 @@
 import { Shell } from "@/components/shell";
 import { getCtx, getOrgData } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await getCtx();
   const data = await getOrgData();

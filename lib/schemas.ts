@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   ACCOUNT_STATUSES, APPROVAL_STATUSES, ASSET_CATEGORIES, CONTRACT_STATUSES, DELIVERABLE_CATEGORIES,
   DELIVERABLE_STATUSES, EVENT_STATUSES, PRIORITIES, ROLES, SPONSOR_TIERS, TASK_STATUSES,
-} from "./constants";
+} from "./constants.ts";
 
 const str = (max: number, min = 0) => z.string().trim().min(min).max(max);
 const optStr = (max: number) => str(max).optional();

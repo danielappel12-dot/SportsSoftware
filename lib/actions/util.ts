@@ -1,14 +1,13 @@
 import "server-only";
-import type { z } from "zod";
 import { getCtx, type Ctx } from "@/lib/data";
 import { DEMO_MESSAGE } from "@/lib/env";
 import { ROLE_LABEL, type Role } from "@/lib/constants";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { ActionState } from "./types";
+import { fail } from "./parse";
+export { fail, formObject, parse } from "./parse";
 export type { ActionState };
-
-export const fail = (error: string, fieldErrors?: Record<string, string>): ActionState => ({ ok: false, error, fieldErrors });
 
 /** Translate Postgres / PostgREST errors into messages a user can act on. */
 export function dbError(err: { code?: string; message: string; details?: string | null }): ActionState {
@@ -20,34 +19,6 @@ export function dbError(err: { code?: string; message: string; details?: string 
     case "P0001": return fail(err.message);
     default: return fail(err.message || "Something went wrong. Please try again.");
   }
-}
-
-export function formObject(fd: FormData): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const key of new Set(fd.keys())) {
-    if (key.startsWith("$ACTION")) continue;
-    const vals = fd.getAll(key).filter((v): v is string => typeof v === "string");
-    const cleaned = vals.map((v) => v.trim());
-    if (cleaned.length > 1) out[key] = cleaned.filter(Boolean);
-    else if (cleaned[0] !== "") out[key] = cleaned[0];
-  }
-  return out;
-}
-
-export function parse<S extends z.ZodType>(
-  schema: S,
-  input: FormData | Record<string, unknown>,
-): { ok: true; data: z.output<S> } | { ok: false; state: ActionState } {
-  const raw = input instanceof FormData ? formObject(input) : input;
-  const result = schema.safeParse(raw);
-  if (result.success) return { ok: true, data: result.data };
-  const fieldErrors: Record<string, string> = {};
-  for (const issue of result.error.issues) {
-    const key = String(issue.path[0] ?? "_");
-    fieldErrors[key] ??= issue.message;
-  }
-  const first = Object.values(fieldErrors)[0];
-  return { ok: false, state: fail(first ? `Please fix the highlighted fields. ${first}` : "Invalid input.", fieldErrors) };
 }
 
 /** Optional keys that are absent after parsing become explicit nulls (so edits can clear fields). */

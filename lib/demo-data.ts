@@ -1,18 +1,30 @@
 // FICTIONAL sample data used only in demo mode. Nothing here is ever written to a database.
-import { addDays, todayISO } from "./dates";
-import type { OrgData, Deliverable, Sponsor, Contract } from "./types";
+import { addDays, todayISO } from "./dates.ts";
+import type { OrgData, Deliverable, Sponsor, Contract } from "./types.ts";
 
-export const DEMO_ORG = { id: "demo-org", name: "Riverton Rapids (Fictional Demo)" };
-export const DEMO_USER = { id: "demo-u1", email: "demo@sponsorsync.example", full_name: "Alex Demo" };
+/** Map readable demo ids ("demo-s1") to deterministic, valid UUIDs so server-side validation behaves like production. */
+export function demoId(id: string): string {
+  const m = /^demo-([a-z]+)(\d*)$/.exec(id);
+  if (!m) return id;
+  const hex = [...m[1].slice(0, 4)].map((c) => c.charCodeAt(0).toString(16)).join("").padEnd(8, "0").slice(0, 8);
+  return `${hex}-0000-4000-8000-${(m[2] || "0").padStart(12, "0")}`;
+}
+
+export const DEMO_ORG = { id: demoId("demo-org"), name: "Riverton Rapids (Fictional Demo)" };
+export const DEMO_USER = { id: demoId("demo-u1"), email: "demo@sponsorsync.example", full_name: "Alex Demo" };
 
 export function buildDemoData(now: Date = new Date()): OrgData {
+  return JSON.parse(JSON.stringify(build(now)), (_k, v) => (typeof v === "string" ? demoId(v) : v));
+}
+
+function build(now: Date): OrgData {
   const today = todayISO(now);
   const day = (n: number) => addDays(today, n);
   const ts = (n: number, hours = 19) => {
     const d = new Date(now); d.setUTCDate(d.getUTCDate() + n); d.setUTCHours(hours, 0, 0, 0); return d.toISOString();
   };
-  const org = DEMO_ORG.id;
-  const me = DEMO_USER.id;
+  const org = "demo-org";
+  const me = "demo-u1";
   const created = ts(-100);
 
   const sp = (id: string, name: string, industry: string, tier: string, status: string, contact: string, value: number,
