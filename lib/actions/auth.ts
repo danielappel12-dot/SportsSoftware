@@ -23,6 +23,7 @@ export async function login(_: ActionState, fd: FormData): Promise<ActionState> 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(p.data);
   if (error) return fail(error.message === "Invalid login credentials" ? "Incorrect email or password." : error.message);
+  await supabase.rpc("accept_invites"); // join any organization that invited this email
   redirect("/dashboard");
 }
 

@@ -1,17 +1,22 @@
 import { FileText, ImageIcon } from "lucide-react";
 import { Badge, EmptyState } from "@/components/ui";
-import { ActionForm, Field, Input } from "@/components/ui/form";
+import { ActionForm, Field, Input, Select } from "@/components/ui/form";
 import { RunButton } from "@/components/ui/toast";
 import { deleteEvidence, setEvidenceInReport, uploadEvidence } from "@/lib/actions/assets";
 import { fmtDate } from "@/lib/dates";
 import type { Asset, Evidence } from "@/lib/types";
 
-export function EvidenceUploader({ sponsorId, deliverableId, eventId, taskId, compact }: {
-  sponsorId?: string; deliverableId?: string; eventId?: string; taskId?: string; compact?: boolean;
+export function EvidenceUploader({ sponsorId, sponsorOptions, deliverableId, eventId, taskId, compact }: {
+  sponsorId?: string; sponsorOptions?: { id: string; name: string }[]; deliverableId?: string; eventId?: string; taskId?: string; compact?: boolean;
 }) {
   return (
     <ActionForm action={uploadEvidence} submitLabel="Upload evidence" resetOnSuccess className={compact ? "" : "max-w-xl"}>
       {sponsorId && <input type="hidden" name="sponsor_id" value={sponsorId} />}
+      {sponsorOptions && (
+        <Field name="sponsor_id" label="Sponsor" required>
+          <Select name="sponsor_id" defaultValue="" required><option value="" disabled>Which sponsor is this for?</option>{sponsorOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</Select>
+        </Field>
+      )}
       {deliverableId && <input type="hidden" name="deliverable_id" value={deliverableId} />}
       {eventId && <input type="hidden" name="event_id" value={eventId} />}
       {taskId && <input type="hidden" name="event_task_id" value={taskId} />}
