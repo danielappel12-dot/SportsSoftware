@@ -1,0 +1,6 @@
+# OPTIONAL: PaddleOCR jersey-number reader. Needs Python 3.9 - 3.12 (PaddlePaddle 2.6 has no 3.13 wheels).
+# Install into the same virtualenv:  pip install -r requirements-ml.txt
+# On Apple-silicon and Windows these are CPU builds; for NVIDIA GPUs install `paddlepaddle-gpu` instead (see docs/MODELS.md).
+paddlepaddle==2.6.2
+paddleocr==2.9.1
+numpy<2.0   # PaddlePaddle 2.6 is built against NumPy 1.x

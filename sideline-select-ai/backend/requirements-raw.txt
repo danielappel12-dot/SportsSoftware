@@ -1,0 +1,2 @@
+# OPTIONAL: camera RAW decoding (CR2, CR3, NEF, ARW, DNG, RAF, ORF, RW2 ...) through LibRaw.
+rawpy==0.25.1
